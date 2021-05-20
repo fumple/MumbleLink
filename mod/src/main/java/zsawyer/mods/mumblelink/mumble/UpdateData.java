@@ -22,6 +22,7 @@
 package zsawyer.mods.mumblelink.mumble;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import zsawyer.mods.mumblelink.MumbleLinkConstants;
@@ -122,11 +123,26 @@ public class UpdateData {
             Vector3d lookDirection = game.player.getLookVec();
             Vector3d topDirection = getTopVec(game);
 
+            int dimensionOffset = 10240;
+            ResourceLocation dimensionLocation = game.player.getEntityWorld().getDimensionKey().getLocation();
+            if(dimensionLocation.getNamespace() == "minecraft"){
+                if(dimensionLocation.getPath() == "overworld"){
+                    dimensionOffset = 0 * dimensionOffset;
+                } else if(dimensionLocation.getPath() == "the_nether"){
+                    dimensionOffset = 1 * dimensionOffset;
+                } else if(dimensionLocation.getPath() == "the_end"){
+                    dimensionOffset = 2 * dimensionOffset;
+                }
+            }
+            else{
+                dimensionOffset = 0 * dimensionOffset;
+            }
+
             // Position of the avatar
             fAvatarPosition = new float[]{
                     (float) game.player.getPositionVec().getX(),
                     (float) game.player.getPositionVec().getZ(),
-                    (float) game.player.getPositionVec().getY()
+                    (float) game.player.getPositionVec().getY() + dimensionOffset
             };
 
             // Unit vector pointing out of the avatar's eyes (here Front looks
@@ -149,7 +165,7 @@ public class UpdateData {
             fCameraPosition = new float[]{
                     (float) game.player.getPositionVec().getX(),
                     (float) game.player.getPositionVec().getZ(),
-                    (float) game.player.getPositionVec().getY()
+                    (float) game.player.getPositionVec().getY() + dimensionOffset
             };
 
             fCameraFront = new float[]{
