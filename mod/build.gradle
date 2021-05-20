@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net/' }
         jcenter()
         mavenCentral()
     }
@@ -10,7 +10,7 @@ buildscript {
 }
 
 repositories {
-    maven { url = 'https://files.minecraftforge.net/maven' }
+    maven { url = 'https://maven.minecraftforge.net/' }
     jcenter()
     mavenCentral()
 }
@@ -30,6 +30,7 @@ archivesBaseName = "mumblelink"
 ext.vendorName = "zsawyer." + archivesBaseName
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+compileJava.options.compilerArgs.addAll(['--release', '8'])
 
 minecraft {
     mappings channel: 'snapshot', version: '20201028-1.16.3'
