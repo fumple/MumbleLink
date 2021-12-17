@@ -22,12 +22,9 @@
 package zsawyer.mods.mumblelink.mumble;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import zsawyer.mods.mumblelink.MumbleLinkConstants;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import zsawyer.mods.mumblelink.MumbleLinkImpl;
-import zsawyer.mods.mumblelink.api.ContextManipulator;
 import zsawyer.mods.mumblelink.api.IdentityManipulator;
 import zsawyer.mods.mumblelink.error.NativeUpdateErrorHandler;
 import zsawyer.mods.mumblelink.error.NativeUpdateErrorHandler.NativeUpdateError;
@@ -120,11 +117,11 @@ public class UpdateData {
             float fCameraTopY = 1; // Y points up
             float fCameraTopZ = 1;
 
-            Vector3d lookDirection = game.player.getLookVec();
-            Vector3d topDirection = getTopVec(game);
+            Vec3 lookDirection = game.player.getLookAngle();
+            Vec3 topDirection = getTopVec(game);
 
             int dimensionOffset = 10240;
-            ResourceLocation dimensionLocation = game.player.getEntityWorld().getDimensionKey().getLocation();
+            ResourceLocation dimensionLocation = game.player.getCommandSenderWorld().dimension().location();
             if(dimensionLocation.getNamespace() == "minecraft"){
                 if(dimensionLocation.getPath() == "overworld"){
                     dimensionOffset = 0 * dimensionOffset;
@@ -140,9 +137,9 @@ public class UpdateData {
 
             // Position of the avatar
             fAvatarPosition = new float[]{
-                    (float) game.player.getPositionVec().getX(),
-                    (float) game.player.getPositionVec().getZ(),
-                    (float) game.player.getPositionVec().getY() + dimensionOffset
+                    (float) game.player.getPosition(1f).x(),
+                    (float) game.player.getPosition(1f).z(),
+                    (float) game.player.getPosition(1f).y() + dimensionOffset
             };
 
             // Unit vector pointing out of the avatar's eyes (here Front looks
@@ -163,9 +160,9 @@ public class UpdateData {
 
             // TODO: use real camera position, s.a.
             fCameraPosition = new float[]{
-                    (float) game.player.getPositionVec().getX(),
-                    (float) game.player.getPositionVec().getZ(),
-                    (float) game.player.getPositionVec().getY() + dimensionOffset
+                    (float) game.player.getPosition(1f).x(),
+                    (float) game.player.getPosition(1f).z(),
+                    (float) game.player.getPosition(1f).y() + dimensionOffset
             };
 
             fCameraFront = new float[]{
@@ -212,32 +209,11 @@ public class UpdateData {
     }
 
     protected String generateContext(Minecraft game, int maxLength) {
-        try {
-            JSONObject newContext = new JSONObject();
-            newContext.put(ContextManipulator.ContextKey.DOMAIN,
-                    MumbleLinkConstants.MUMBLE_CONTEXT_DOMAIN_ALL_TALK);
-            return newContext.toString();
-        } catch (JSONException e) {
-            MumbleLinkImpl.LOG.fatal("could not generate context", e);
-        }
-
-        return MumbleLinkConstants.MUMBLE_CONTEXT_DOMAIN_ALL_TALK;
+        // empty context because the plugin name is already always prepended anyways
+        return "";
     }
 
-    private Vector3d getTopVec(Minecraft game) {
-        float f1 = MathHelper.cos(-game.player.rotationYaw * 0.017453292F
-                - (float) Math.PI);
-        float f2 = MathHelper.sin(-game.player.rotationYaw * 0.017453292F
-                - (float) Math.PI);
-        float f3 = -MathHelper
-                .cos((-game.player.rotationPitch + 90) * 0.017453292F);
-        float f4 = MathHelper
-                .sin((-game.player.rotationPitch + 90) * 0.017453292F);
-
-        return new Vector3d(
-                f2 * f3,
-                f4,
-                f1 * f3
-        );
+    private Vec3 getTopVec(Minecraft game) {
+        return game.player.getUpVector(1f);
     }
 }

@@ -21,10 +21,8 @@
  */
 package zsawyer.mods.mumblelink.notification;
 
-import com.mojang.brigadier.Message;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentUtils;
+import net.minecraft.network.chat.TextComponent;
 
 /**
  * @author zsawyer
@@ -49,12 +47,11 @@ public class ChatNotifier implements UserNotifier {
     }
 
     protected boolean canSendMessage() {
-        return game != null && game.ingameGUI != null && game.isGameFocused()
-                && game.ingameGUI.getChatGUI() != null;
+        return game != null && game.gui != null && game.gui.getChat() != null && game.screen == null;
     }
 
     protected void send(String message) {
-        ITextComponent messageObject = TextComponentUtils.toTextComponent(() -> message);
-        game.ingameGUI.getChatGUI().printChatMessage(messageObject);
+        TextComponent messageObject = new TextComponent(message);
+        game.gui.getChat().addMessage(messageObject);
     }
 }
